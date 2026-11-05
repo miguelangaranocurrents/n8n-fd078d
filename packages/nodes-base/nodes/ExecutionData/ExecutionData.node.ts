@@ -120,7 +120,7 @@ export class ExecutionData implements INodeType {
 
 					const values = dataToSave.reduce(
 						(acc, { key, value }) => {
-							// Expressions can resolve to booleans or numbers. Store them as strings, and keep 0 and false.
+							// Resolved values can be booleans or numbers. Store them as strings.
 							const valueToSet =
 								value === undefined || value === null
 									? nodeVersion >= 1.1
