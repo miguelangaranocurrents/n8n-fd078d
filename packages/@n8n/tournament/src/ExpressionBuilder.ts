@@ -138,6 +138,13 @@ const fixStringNewLines = (node: types.namedTypes.File): types.namedTypes.File =
 		return str.replace(/\n/g, '\\n');
 	};
 	visit(node, {
+		visitTemplateLiteral(path) {
+			this.traverse(path);
+			// Print the literal from its parts. Reusing the original multi-line source
+			// can splice the replaced quasis at stale positions.
+			path.replace(b.templateLiteral(path.node.quasis, path.node.expressions));
+			return false;
+		},
 		visitTemplateElement(path) {
 			this.traverse(path);
 			const el = b.templateElement(

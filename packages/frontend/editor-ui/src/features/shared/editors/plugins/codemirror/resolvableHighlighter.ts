@@ -129,24 +129,17 @@ export const coloringStateField = StateField.define<DecorationSet>({
 });
 
 function addColor(view: EditorView, segments: Resolvable[]) {
-	const colorEffects: Array<StateEffect<unknown>> = segments.map(({ from, to, kind, state }) =>
+	const effects: Array<StateEffect<unknown>> = segments.map(({ from, to, kind, state }) =>
 		coloringStateEffects.addColorEffect.of({ from, to, kind, state }),
 	);
 
-	if (colorEffects.length === 0) return;
+	if (effects.length === 0) return;
 
-	const needsField = !view.state.field(coloringStateField, false);
-	const effects = needsField
-		? [...colorEffects, StateEffect.appendConfig.of([coloringStateField, resolvablesTheme])]
-		: colorEffects;
+	if (!view.state.field(coloringStateField, false)) {
+		effects.push(StateEffect.appendConfig.of([coloringStateField, resolvablesTheme]));
+	}
 
 	view.dispatch({ effects });
-
-	// A field appended in this transaction does not reliably receive that
-	// transaction's effects. Apply the colors again now that the field exists.
-	if (needsField) {
-		view.dispatch({ effects: colorEffects });
-	}
 }
 
 function removeColor(view: EditorView, segments: Plaintext[]) {
